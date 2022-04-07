@@ -20,7 +20,10 @@ inputs:
 
 runs:
   using: "composite"
+  env:
+    IMAGE_TAG: ${{ github.run_id }}_${{ github.sha }}
   steps:
+    - uses: actions/checkout@v2
     - name: Use Node.js 12.x
       uses: actions/setup-node@v2
       with:
@@ -48,7 +51,7 @@ runs:
 
     - name: Build docker image
       shell: bash
-      run: docker build -t ${{inputs.registry-name}}:${{inputs.image-tag}} .
+      run: docker build -t ${{inputs.registry-name}}:${{IMAGE_TAG}} .
 
     - name: Configure AWS Stage credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -64,5 +67,5 @@ runs:
     - name: Push to stage
       shell: bash
       run: |
-        docker tag ${{inputs.registry-name}}:${{inputs.image-tag}} ${{steps.login-ecr-stage.outputs.registry}}/${{inputs.registry-name}}:${{inputs.image-tag}}
-        docker push ${{ steps.login-ecr-stage.outputs.registry }}/${{inputs.registry-name}}:${{inputs.image-tag}}
+        docker tag ${{inputs.registry-name}}:${{IMAGE_TAG}} ${{steps.login-ecr-stage.outputs.registry}}/${{inputs.registry-name}}:${{IMAGE_TAG}}
+        docker push ${{ steps.login-ecr-stage.outputs.registry }}/${{inputs.registry-name}}:${{IMAGE_TAG}}
