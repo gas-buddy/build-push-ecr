@@ -1,10 +1,12 @@
 FROM gasbuddy/node-app:12-production
 
+ARG NODE_ENV_ARG=production
+
 WORKDIR /pipeline/source
 
 COPY . .
 
-ENV NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV_ARG
 
 RUN apk add --no-cache --virtual .npm-deps build-base python3 openssl make gcc g++ && \
   rm -rf node_modules/.bin && \
