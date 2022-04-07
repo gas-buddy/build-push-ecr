@@ -18,23 +18,33 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Build docker image
+    - name: find action file path
       shell: bash
-      run: docker build -t ${{inputs.registry-name}}:${{inputs.image-tag}} .
-
-    - name: Configure AWS Stage credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{inputs.aws-access-key-id}}
-        aws-secret-access-key: ${{inputs.aws-secret-access-key}}
-        aws-region: us-east-1
-
-    - name: Login to Amazon Stage ECR
-      id: login-ecr-stage
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Push to stage
+      run: echo ${{github.action_path}}
+    - name: find whats in the action path
       shell: bash
-      run: |
-        docker tag ${{inputs.registry-name}}:${{inputs.image-tag}} ${{steps.login-ecr-stage.outputs.registry}}/${{inputs.registry-name}}:${{inputs.image-tag}}
-        docker push ${{ steps.login-ecr-stage.outputs.registry }}/${{inputs.registry-name}}:${{inputs.image-tag}}
+      run: ls -d ${{github.action_path}}/*
+    - name: find whats in the current path
+      shell: bash
+      run: ls
+
+#    - name: Build docker image
+#      shell: bash
+#      run: docker build -t ${{inputs.registry-name}}:${{inputs.image-tag}} .
+#
+#    - name: Configure AWS Stage credentials
+#      uses: aws-actions/configure-aws-credentials@v1
+#      with:
+#        aws-access-key-id: ${{inputs.aws-access-key-id}}
+#        aws-secret-access-key: ${{inputs.aws-secret-access-key}}
+#        aws-region: us-east-1
+#
+#    - name: Login to Amazon Stage ECR
+#      id: login-ecr-stage
+#      uses: aws-actions/amazon-ecr-login@v1
+#
+#    - name: Push to stage
+#      shell: bash
+#      run: |
+#        docker tag ${{inputs.registry-name}}:${{inputs.image-tag}} ${{steps.login-ecr-stage.outputs.registry}}/${{inputs.registry-name}}:${{inputs.image-tag}}
+#        docker push ${{ steps.login-ecr-stage.outputs.registry }}/${{inputs.registry-name}}:${{inputs.image-tag}}
