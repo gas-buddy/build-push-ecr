@@ -1,0 +1,40 @@
+name: "Build and Publish to ECR"
+description: "Builds and Pushes built artifacts to ECT"
+
+inputs:
+  image-tag:
+    description: "Image tag"
+    required: true
+  registry-name:
+    description: "Name of the ECR registry"
+    required: true
+  aws-access-key-id:
+    description: "Username for image registry"
+    required: true
+  aws-secret-access-key:
+    description: "Password for image registry"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build docker image
+      shell: bash
+      run: docker build -t ${{inputs.registry-name}}:${{inputs.image-tag}} .
+
+    - name: Configure AWS Stage credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{inputs.aws-access-key-id}}
+        aws-secret-access-key: ${{secrets.aws-secret-access-key}}
+        aws-region: us-east-1
+
+    - name: Login to Amazon Stage ECR
+      id: login-ecr-stage
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Push to stage
+      shell: bash
+      run: |
+        docker tag ${{inputs.registry-name}}:${{inputs.image-tag}} ${{steps.login-ecr-stage.outputs.registry}}/${{inputs.registry-name}}:${{inputs.image-tag}}
+        docker push ${{ steps.login-ecr-stage.outputs.registry }}/${{inputs.registry-name}}:${{inputs.image-tag}}
