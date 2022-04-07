@@ -7,7 +7,8 @@ inputs:
     required: true
   image-tag:
     description: "Image tag"
-    required: true
+    required: false
+    default: ${{ github.run_id }}_${{ github.sha }}
   registry-name:
     description: "Name of the ECR registry"
     required: true
@@ -20,8 +21,6 @@ inputs:
 
 runs:
   using: "composite"
-  env:
-    IMAGE_TAG: ${{ github.run_id }}_${{ github.sha }}
   steps:
     - uses: actions/checkout@v2
     - name: Use Node.js 12.x
@@ -51,7 +50,7 @@ runs:
 
     - name: Build docker image
       shell: bash
-      run: docker build -t ${{inputs.registry-name}}:${{IMAGE_TAG}} .
+      run: docker build -t ${{inputs.registry-name}}:${{inputs.image-tag}} .
 
     - name: Configure AWS Stage credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -67,5 +66,5 @@ runs:
     - name: Push to stage
       shell: bash
       run: |
-        docker tag ${{inputs.registry-name}}:${{IMAGE_TAG}} ${{steps.login-ecr-stage.outputs.registry}}/${{inputs.registry-name}}:${{IMAGE_TAG}}
-        docker push ${{ steps.login-ecr-stage.outputs.registry }}/${{inputs.registry-name}}:${{IMAGE_TAG}}
+        docker tag ${{inputs.registry-name}}:${{inputs.image-tag}} ${{steps.login-ecr-stage.outputs.registry}}/${{inputs.registry-name}}:${{inputs.image-tag}}
+        docker push ${{ steps.login-ecr-stage.outputs.registry }}/${{inputs.registry-name}}:${{inputs.image-tag}}
