@@ -3,68 +3,56 @@ description: "Builds and Pushes built artifacts to ECT"
 
 inputs:
   npm-token:
-    description: "Token for private npm repo"
+    description: "npm credentials, most useful for private repositories"
     required: true
+  node-env:
+    description: "The NODE_ENV value for the image, defaults to production"
+    required: false
   image-tag:
-    description: "Image tag"
+    description: "The desired tag for the Docker image"
     required: false
     default: ${{ github.run_id }}_${{ github.sha }}
   registry-name:
-    description: "Name of the ECR registry"
+    description: "The name of the ECR registry repository"
     required: true
   aws-access-key-id:
-    description: "Username for image registry"
+    description: "AWS account id for image registry"
     required: true
   aws-secret-access-key:
-    description: "Password for image registry"
+    description: "AWS Secret for the access key"
     required: true
+  aws-region:
+    description: "AWS region for the image registry"
+    required: false
+    default: us-east-1
+  skip-build:
+    description: "Set to true if the Docker image is already built earlier in the workflow"
+    required: false
+    default: false
 
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js 12.x
-      uses: actions/setup-node@v2
-      with:
-        node-version: '12.x'
-
-    - name: npm install
-      shell: bash
-      run: |
-        npm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
-        npm install
-      env:
-        NPM_TOKEN: ${{inputs.npm-token}}
-
-    - name: Run build
-      shell: bash
-      run: npm run build
-
-    - name: Build swagger client
-      shell: bash
-      run: npm run swagger-pack
-
-    - name: Copy docker file from action to caller job
-      shell: bash
-      run: cp ${{github.action_path}}/Dockerfile .
-
-    - name: Build docker image
-      shell: bash
-      run: docker build -t ${{inputs.registry-name}}:${{inputs.image-tag}} .
-
-    - name: Configure AWS Stage credentials
+    - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{inputs.aws-access-key-id}}
         aws-secret-access-key: ${{inputs.aws-secret-access-key}}
-        aws-region: us-east-1
+        aws-region: ${{inputs.aws-region}}
 
     - name: Login to Amazon Stage ECR
-      id: login-ecr-stage
+      id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Push to stage
+    - name: Build the docker image
       shell: bash
       run: |
-        docker tag ${{inputs.registry-name}}:${{inputs.image-tag}} ${{steps.login-ecr-stage.outputs.registry}}/${{inputs.registry-name}}:${{inputs.image-tag}}
-        docker push ${{ steps.login-ecr-stage.outputs.registry }}/${{inputs.registry-name}}:${{inputs.image-tag}}
+        cp ${{github.action_path}}/Dockerfile .
+        docker build -t ${{inputs.registry-name}}:${{inputs.image-tag}} . NODE_ENV_ARG=${{inputs.node-env}}
+      if: ${{ inputs.skip-build != 'true' }}
+
+    - name: Push docker image to ECR
+      shell: bash
+      run: |
+        docker tag ${{inputs.registry-name}}:${{inputs.image-tag}} ${{steps.login-ecr.outputs.registry}}/${{inputs.registry-name}}:${{inputs.image-tag}}
+        docker push ${{ steps.login-ecr.outputs.registry }}/${{inputs.registry-name}}:${{inputs.image-tag}}
