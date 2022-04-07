@@ -27,6 +27,9 @@ runs:
     - name: find whats in the current path
       shell: bash
       run: ls
+    - name: Copy docker file from action to caller job
+      shell: bash
+      run: cp ${{github.action_path}}/Dockerfile .
 
 #    - name: Build docker image
 #      shell: bash
