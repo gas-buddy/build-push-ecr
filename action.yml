@@ -39,12 +39,6 @@ runs:
         aws-access-key-id: ${{inputs.aws-access-key-id}}
         aws-secret-access-key: ${{inputs.aws-secret-access-key}}
         aws-region: ${{inputs.aws-region}}
-      env:
-        AWS_ACCESS_KEY_ID: ""
-        AWS_SECRET_ACCESS_KEY: ""
-        AWS_SESSION_TOKEN: ""
-        AWS_DEFAULT_REGION: ""
-        AWS_REGION: ""
 
     - name: Display AWS caller identity
       run: aws sts get-caller-identity
