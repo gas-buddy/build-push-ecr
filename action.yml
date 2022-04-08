@@ -48,7 +48,7 @@ runs:
       shell: bash
       run: |
         cp ${{github.action_path}}/Dockerfile .
-        docker build -t ${{inputs.registry-name}}:${{inputs.image-tag}} . NODE_ENV_ARG=${{inputs.node-env}}
+        docker build --build-arg NODE_ENV_ARG=${{inputs.node-env}} -t ${{inputs.registry-name}}:${{inputs.image-tag}} . NODE_ENV_ARG=${{inputs.node-env}}
       if: ${{ inputs.skip-build != 'true' }}
 
     - name: Push docker image to ECR
