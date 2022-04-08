@@ -44,7 +44,7 @@ runs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build the docker image
+    - name: Build docker image ${{inputs.registry-name}}:${{inputs.image-tag}}
       shell: bash
       run: |
         cp ${{github.action_path}}/Dockerfile .
