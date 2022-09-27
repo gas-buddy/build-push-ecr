@@ -1,4 +1,4 @@
-FROM gasbuddy/node-app:14-production
+FROM gasbuddy/node-app:10-production
 
 ARG NODE_ENV_ARG=production
 
