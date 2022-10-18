@@ -12,6 +12,10 @@ inputs:
     description: "The desired tag for the Docker image"
     required: false
     default: ${{ github.run_id }}_${{ github.sha }}
+  node-image-tag:
+    description: "The tag for the base node-app image"
+    required: false
+    default: 14-production
   registry-name:
     description: "The name of the ECR registry repository"
     required: true
@@ -38,7 +42,7 @@ runs:
       shell: bash
       run: |
         cp ${{ github.action_path }}/Dockerfile .
-        docker build --build-arg NODE_ENV_ARG=${{ inputs.node-env }} -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
+        docker build --build-arg NODE_ENV_ARG=${{ inputs.node-env }} --build-arg NODE_IMAGE_TAG=${{ inputs.node-image-tag }} -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
       if: ${{ inputs.skip-build != 'true' }}
 
     - name: Push to ECR

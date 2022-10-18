@@ -1,4 +1,6 @@
-FROM gasbuddy/node-app:14-production
+ARG NODE_IMAGE_TAG=14-production
+
+FROM gasbuddy/node-app:${NODE_IMAGE_TAG}
 
 ARG NODE_ENV_ARG=production
 
