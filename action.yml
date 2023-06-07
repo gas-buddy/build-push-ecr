@@ -33,6 +33,9 @@ inputs:
     description: "Set to true if the Docker image is already built earlier in the workflow"
     required: false
     default: false
+  apk_packages:
+    description: "Extra packages required to build the image"
+    required: false
 
 runs:
   using: "composite"
@@ -42,7 +45,7 @@ runs:
       shell: bash
       run: |
         cp ${{ github.action_path }}/Dockerfile .
-        docker build --build-arg NODE_ENV_ARG=${{ inputs.node-env }} --build-arg NODE_IMAGE_TAG=${{ inputs.node-image-tag }} -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
+        docker build --build-arg NODE_ENV_ARG=${{ inputs.node-env }} --build-arg NODE_IMAGE_TAG=${{ inputs.node-image-tag }} --build-arg APK_PACKAGES=${{ inputs.apk_packages }} -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
       if: ${{ inputs.skip-build != 'true' }}
 
     - name: Push to ECR
