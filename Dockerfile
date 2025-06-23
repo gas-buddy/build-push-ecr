@@ -1,6 +1,6 @@
 ARG NODE_IMAGE_TAG=14-production
 
-FROM gasbuddy/node-app:${NODE_IMAGE_TAG}
+FROM ghcr.io/gas-buddy/docker-gasbuddy-nodeapp:${NODE_IMAGE_TAG}
 
 ARG NODE_ENV_ARG=production
 ARG APK_PACKAGES
