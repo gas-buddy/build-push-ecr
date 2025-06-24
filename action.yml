@@ -57,6 +57,11 @@ runs:
         docker build -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
       if: ${{ inputs.skip-build != 'true' }}
 
+    - name: Unset AWS token
+      id: unset-aws-token
+      shell: bash
+      run: echo "AWS_SESSION_TOKEN=''" >> $GITHUB_ENV
+
     - name: Push to ECR
       id: ecr
       uses: gas-buddy/gh-ecr-push@v2.0.2
