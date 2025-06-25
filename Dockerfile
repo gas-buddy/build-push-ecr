@@ -4,6 +4,7 @@ FROM ghcr.io/gas-buddy/docker-gasbuddy-nodeapp:${NODE_IMAGE_TAG}
 
 ARG NODE_ENV_ARG=production
 ARG APK_PACKAGES
+ARG NPM_TOKEN
 
 WORKDIR /pipeline/source
 

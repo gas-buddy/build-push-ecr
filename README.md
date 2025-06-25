@@ -25,7 +25,7 @@ This GitHub action builds a container that will run a node app (via `npm start`)
     ghcr-password: ${{ secrets.GITHUB_TOKEN }}  # Default: ""
 ```
 
-> **Note**: If GHCR credentials are not provided as inputs, login to GHCR must be done before calling this composite action if you need to access private GHCR packages during the build process.
+> **Note**: If GHCR credentials are not provided as inputs, login to GHCR must be done before calling this composite action, otherwise action will fail to pull private GHCR images during the build process.
 
 ## Workflow Steps
 
