@@ -4,7 +4,8 @@ description: "Builds and Pushes built artifacts to ECT"
 inputs:
   npm-token:
     description: "npm credentials, most useful for private repositories"
-    required: true
+    required: false
+    default: ""
   node-env:
     description: "The NODE_ENV value for the image, defaults to production"
     required: false
@@ -36,10 +37,31 @@ inputs:
   apk_packages:
     description: "Extra packages required to build the image"
     required: false
+  ghcr-username:
+    description: "GitHub Container Registry username"
+    required: false
+    default: ""
+  ghcr-password:
+    description: "GitHub Container Registry password/token"
+    required: false
+    default: ""
 
 runs:
   using: "composite"
   steps:
+    - name: GHCR login
+      if: ${{ inputs.ghcr-username != '' && inputs.ghcr-password != '' }}
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ inputs.ghcr-username }}
+        password: ${{ inputs.ghcr-password }}
+
+    - name: Set NPM_TOKEN
+      if: ${{ inputs.npm-token != '' }}
+      shell: bash
+      run: echo "NPM_TOKEN=${{ inputs.npm-token }}" >> $GITHUB_ENV
+
     - name: Build docker image ${{ inputs.registry-name }}:${{ inputs.image-tag }}
       shell: bash
       run: |
@@ -50,7 +72,7 @@ runs:
         docker build -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
       if: ${{ inputs.skip-build != 'true' }}
 
-    - name: Unset AWS token
+    - name: Unset AWS credentials token
       id: unset-aws-token
       shell: bash
       run: echo "AWS_SESSION_TOKEN=" >> $GITHUB_ENV
