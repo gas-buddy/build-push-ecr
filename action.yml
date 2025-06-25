@@ -69,6 +69,7 @@ runs:
         export NODE_ENV_ARG="${{ inputs.node-env }}"
         export NODE_IMAGE_TAG="${{ inputs.node-image-tag }}"
         export APK_PACKAGES="${{ inputs.apk_packages }}"
+        export NPM_TOKEN="${{ inputs.npm-token }}"
         docker build -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
       if: ${{ inputs.skip-build != 'true' }}
 
