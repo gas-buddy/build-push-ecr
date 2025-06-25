@@ -13,7 +13,7 @@ COPY . .
 ENV NODE_ENV=$NODE_ENV_ARG
 
 RUN apk add --no-cache --virtual .npm-deps build-base python3 openssl make gcc g++ ${APK_PACKAGES} && \
-  npm config set '//registry.npmjs.org/:_authToken' $NPM_TOKEN && \
+  echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc && \
   rm -rf node_modules/.bin && \
   npm i -g node-pre-gyp prebuild-install && \
   npm rebuild && \
