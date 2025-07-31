@@ -66,11 +66,7 @@ runs:
       shell: bash
       run: |
         cp ${{ github.action_path }}/Dockerfile .
-        export NODE_ENV_ARG="${{ inputs.node-env }}"
-        export NODE_IMAGE_TAG="${{ inputs.node-image-tag }}"
-        export APK_PACKAGES="${{ inputs.apk_packages }}"
-        export NPM_TOKEN="${{ inputs.npm-token }}"
-        docker build -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
+        docker build --build-arg NODE_IMAGE_TAG=${{ inputs.node-image-tag }} --build-arg NODE_ENV_ARG=${{ inputs.node-env }} --build-arg APK_PACKAGES=${{ inputs.apk_packages }} --build-arg NPM_TOKEN=${{ inputs.npm-token }} -t ${{ inputs.registry-name }}:${{ inputs.image-tag }} .
       if: ${{ inputs.skip-build != 'true' }}
 
     - name: Unset AWS credentials token
